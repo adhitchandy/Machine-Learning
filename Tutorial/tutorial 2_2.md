@@ -412,6 +412,8 @@ plt.show()
 - **`plt.legend(...)`**, **`plt.ylabel(...)`**, **`plt.xlabel(...)`**, and **`plt.title(...)`**: These commands add a legend, label axes, and set the title of the plot, respectively.
 - **`plt.show()`**: Displays the plot.
 
+![Scaled plot](image-1.png)
+
 **Benefits of Standardization**
 - **Equal Importance**: Standardizing the data gives all features the same importance due to scaling.
 - **Performance Improvement**: Many machine learning algorithms perform better or converge faster when features are on a relatively similar scale and close to normally distributed.
