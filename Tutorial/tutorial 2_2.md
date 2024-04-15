@@ -152,6 +152,7 @@ This provides a quick and useful summary of the data, highlighting key trends an
 ### Feature Engineering
 ```
 cat_cols = df.select_dtypes('object').columns.to_list()
+num_cols = df.select_dtypes('float').columns.to_list()
 ```
 `cat_cols = df.select_dtypes('object').columns.to_list()` creates a list named cat_cols that contains the names of all columns in df whose data type is object. This is particularly useful when you need to perform operations specifically on categorical data, such as encoding these categories into numbers for machine learning purposes, filtering, or specific data manipulations involving text.
 ```
@@ -357,12 +358,43 @@ X = pd.DataFrame(x, columns=cols_x)
     ```python
     from sklearn.preprocessing import StandardScaler
     scaler = StandardScaler()
-    x = scaler.fit_transform(x)
+    x_scaled = scaler.fit_transform(x[num_cols])
+    x = pd.concat([x.drop(columns=num_cols), pd.DataFrame(x_scaled, columns=num_cols, index=x.index)], axis=1)
     X = pd.DataFrame(x, columns=cols_x)
     ```
-    - **`StandardScaler()`** creates an instance of StandardScaler, which standardizes features by removing the mean and scaling to unit variance. This standardization ensures that each feature contributes equally to the analysis, particularly important for models like SVM, k-NN, and logistic regression.
-    - **`fit_transform(x)`**: This fits the scaler to your data `x` and then transforms it. `fit_transform()` is a combination of `fit()` (to calculate the necessary statistics, i.e., mean and std deviation) and `transform()` (to apply the standardization by subtracting the mean and dividing by the std deviation).
-    - **`pd.DataFrame(x, columns=cols_x)`**: Recreates a DataFrame from the array returned by `fit_transform`, using `cols_x` to label the columns. This is useful because `fit_transform` returns a NumPy array, and you might want to convert this array back to a DataFrame for easier handling and to use DataFrame functionalities.
+   The code snippet you've provided is a good example of how to apply standardization to a subset of columns in a pandas DataFrame using `StandardScaler` from the `sklearn.preprocessing` package. Let's break down each part of the process to understand what it accomplishes:
+
+**Initialize the StandardScaler**
+```python
+scaler = StandardScaler()
+```
+- `StandardScaler` is initialized and stored in the variable `scaler`. This object will be used to standardize the numerical columns, which means scaling them to have a mean of zero and a standard deviation of one.
+
+**Fit and Transform the Numerical Columns**
+```python
+x_scaled = scaler.fit_transform(x[num_cols])
+```
+- `x[num_cols]` selects the numerical columns (specified in the list `num_cols`) from the DataFrame `x`.
+- `scaler.fit_transform()` both computes the mean and standard deviation needed for scaling and applies the transformation to these selected columns. The result, `x_scaled`, is a NumPy array of the standardized data.
+
+**Reintegrate the Scaled Data Back into the Original DataFrame**
+```python
+x = pd.concat([x.drop(columns=num_cols), pd.DataFrame(x_scaled, columns=num_cols, index=x.index)], axis=1)
+```
+- `x.drop(columns=num_cols)` drops the original, unscaled numerical columns from `x`, leaving only the non-numerical or not-to-be-scaled columns.
+- `pd.DataFrame(x_scaled, columns=num_cols, index=x.index)` converts the scaled NumPy array back into a pandas DataFrame, aligning the data with the original DataFrame's index and labeling the columns appropriately.
+- `pd.concat(..., axis=1)` concatenates the DataFrame without the numerical columns and the newly created DataFrame with the scaled numerical columns along `axis=1` (i.e., horizontally), resulting in a DataFrame that includes both the unchanged columns and the scaled columns.
+
+**(Optional) Recreate DataFrame with Original Column Order (if necessary)**
+```python
+X = pd.DataFrame(x, columns=cols_x)
+```
+- This line recreates a new DataFrame `X` using the data from `x` but ensures the columns are in the original order specified by `cols_x`. This step is useful if maintaining a specific column order is important for downstream processes or for readability.
+
+**Summary**
+The process effectively standardizes only the numerical columns of a DataFrame while leaving other columns untouched. This is particularly useful in machine learning preprocessing, where standardization of features is often required for models like linear regression, logistic regression, and neural networks, among others.
+
+This approach ensures that the scaling transformation does not distort relationships among numerical features and that these features contribute equally to model training, improving the performance of algorithms sensitive to the scale of input data.
 ```
 # plot size
 plt.figure(1, figsize=(15, 8))

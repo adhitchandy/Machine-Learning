@@ -1,7 +1,6 @@
 globals().clear()
 
 ####################################################
-
 # Step 1: Import Packages, Functions, and Classes
 ####################################################
 import pandas as pd
@@ -12,24 +11,21 @@ from sklearn.metrics import accuracy_score, confusion_matrix, classification_rep
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
 import os
-
 # %%
 ####################################################
 # Step 2: Get Data and transform the columns
 ####################################################
-os.chdir("/Users/adhitchandy/Library/CloudStorage/OneDrive-M365UniversitätHamburg/Semester 4/Machine Learning/Tutorial")
+os.chdir("Desktop/machine_learning_tutorial")
 
-raw_data = pd.read_csv("watermelon_3_1.csv", encoding='utf-16le')
+raw_data = pd.read_csv("watermelon_3_1.csv",encoding='utf-16le')
 df=raw_data
-print(df)
-
-
 
 print(f'The shape of the dataframe is {df.shape}')
 print(df.columns.to_list())
 
 # check for any null values
 print(df[df.isnull().any(axis=1)].count())
+#%%
 
 df = df.dropna(how='any',axis=0) 
 
@@ -40,10 +36,12 @@ print(df['ripe'].value_counts())
 print(df.info())
 print(df.iloc[:,1:].describe())  # only summary stats for numeric columns
 
+# %%
 ######################
 # Feature Engineering
 ######################
 cat_cols = df.select_dtypes('object').columns.to_list()
+num_cols = df.select_dtypes('float').columns.to_list()
 
 # filter categoricals variables from df which only contain two different values
 df_cat = df.select_dtypes(include=['object'])
@@ -89,7 +87,8 @@ from sklearn.preprocessing import StandardScaler
 # Data standardization to rescale attributes so that they have mean 0 and variance 1 -> (x -mean)/ std
 # Goal: bring all features to common scale without distorting differences in the ranges of values
 scaler = StandardScaler()
-x = scaler.fit_transform(x)
+x_scaled = scaler.fit_transform(x[num_cols])
+x = pd.concat([x.drop(columns=num_cols), pd.DataFrame(x_scaled, columns=num_cols, index=x.index)], axis=1)
 X = pd.DataFrame(x, columns=cols_x)
 
 # plot size
