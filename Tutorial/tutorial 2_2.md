@@ -1,7 +1,7 @@
 # Tutorial 2 
 
 
-### Step 1: Import Packages, Functions, and Classes
+## Step 1: Import Packages, Functions, and Classes
 The following line of codes import the necessary packages functions and classes for this exercise. 
 
 ```
@@ -17,7 +17,7 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 import os
 ```
 
-### Step 2: Get Data and transform the columns
+## Step 2: Get Data and transform the columns
 1. Change the working directory to your current directory, preferably where all the csv files are also available, so that when you type in pathname, you don't have to type in the whole directory!
 ```
 os.chdir("/Users/adhitchandy/Library/CloudStorage/OneDrive-M365UniversitätHamburg/Semester 4/Machine Learning/Tutorial")
@@ -41,10 +41,10 @@ print(df[df.isnull().any(axis=1)].count())
 ```
 The code df[df.isnull().any(axis=1)].count() is used in pandas to perform a couple of specific operations regarding the handling of missing data. Here's a step-by-step breakdown of what each part of this expression does and the overall result:
 
-    a. df.isnull(): This method returns a DataFrame of the same shape as df, where each element is True if the corresponding element in df is NaN or null, and False otherwise.
-    b. any(axis=1): This is applied to the DataFrame returned by df.isnull(). It checks each row to determine if there's at least one True value in that row (i.e., if there's at least one null value in that row). The result is a Series of boolean values where each value corresponds to a row in df. The value is True if there's at least one NaN in the row, and False otherwise.
-    c. df[df.isnull().any(axis=1)]: This uses the boolean Series to filter the original DataFrame df. It selects only those rows where the Series has True values, meaning it selects rows that contain at least one NaN.
-    d. count(): This method is applied to the DataFrame that has been filtered to include only rows with one or more NaN values. It counts the non-null values in each column of this filtered DataFrame. Unlike methods like sum() which would add up values, count() tells you how many entries in each column are not null among the rows that were selected because they have at least one null.
+- df.isnull(): This method returns a DataFrame of the same shape as df, where each element is True if the corresponding element in df is NaN or null, and False otherwise.
+- any(axis=1): This is applied to the DataFrame returned by df.isnull(). It checks each row to determine if there's at least one True value in that row (i.e., if there's at least one null value in that row). The result is a Series of boolean values where each value corresponds to a row in df. The value is True if there's at least one NaN in the row, and False otherwise.
+- df[df.isnull().any(axis=1)]: This uses the boolean Series to filter the original DataFrame df. It selects only those rows where the Series has True values, meaning it selects rows that contain at least one NaN.
+- count(): This method is applied to the DataFrame that has been filtered to include only rows with one or more NaN values. It counts the non-null values in each column of this filtered DataFrame. Unlike methods like sum() which would add up values, count() tells you how many entries in each column are not null among the rows that were selected because they have at least one null.
 
 *Another way to check for null values would be: `print(df.isnull().sum())` and this would give a df in which it says how many values are `NaN` in each column.*
 
@@ -59,40 +59,240 @@ df = df.dropna(how='any',axis=0)
 print(df['ripe'].value_counts())
 ```
 
-# Summary stats of data
+5. Summary stats of data.
+```
 print(df.info())
 print(df.iloc[:,1:].describe())  # only summary stats for numeric columns
+```
+The `print(df.info())` command in pandas is used to display a concise summary of a DataFrame. Here’s what happens when you execute this command:
 
-######################
-# Feature Engineering
-######################
+1. **Method Execution**: `df.info()` is called on the DataFrame `df`. This method returns information about the DataFrame including:
+   - The class type (`DataFrame`)
+   - Index range (including the number of entries)
+   - Column names and count
+   - The number of non-null values in each column
+   - The datatype of each column
+   - The memory usage of the DataFrame
+
+2. **Printing the Output**: While `df.info()` itself prints the information to the console by default, wrapping it in `print()` is generally redundant because `df.info()` does not return anything; it directly prints the output. However, some environments might handle standard output differently, so `print(df.info())` might be used to ensure compatibility or to handle a specific scenario in scripted or embedded Python environments.
+
+Here’s a typical output of `df.info()`:
+
+```
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 5 entries, 0 to 4
+Data columns (total 3 columns):
+ #   Column        Non-Null Count  Dtype  
+---  ------        --------------  -----  
+ 0   ID            5 non-null      int64  
+ 1   Name          5 non-null      object 
+ 2   Age           5 non-null      float64
+dtypes: float64(1), int64(1), object(1)
+Memory usage: 248.0+ bytes
+```
+
+### Key Details in the Output:
+- **Class Type**: Shows that the object is a DataFrame.
+- **Index Range**: Indicates the range of index labels.
+- **Columns**:
+  - Shows each column with its position, name, count of non-null data, and data type.
+- **Dtypes**: Lists the data types present in the DataFrame.
+- **Memory Usage**: Indicates the amount of memory the DataFrame is using.
+
+The `info()` method is very useful for getting a quick overview of the DataFrame, especially to check for data completeness and data types, which helps in preprocessing and cleaning data.
+
+The command `print(df.iloc[:,1:].describe())` in pandas performs a detailed statistical summary of the DataFrame `df`, excluding the first column. Let’s break down the command:
+
+1. **Indexing with `iloc`**: 
+   - `df.iloc[:, 1:]` uses the `iloc` indexer to select all rows (`:`) and all columns starting from the second column (`1:`) to the end. This effectively slices the DataFrame to exclude the first column.
+
+2. **Describing the Data**:
+   - `describe()` is a method that provides descriptive statistics that summarize the central tendency, dispersion, and shape of a dataset's distribution, excluding `NaN` values. By default, it includes only numerical columns unless the DataFrame consists entirely of categorical data or a mix of numeric and categorical data, in which case `describe()` will include summaries for categorical data as well.
+
+3. **Printing the Output**: 
+   - Wrapping `df.iloc[:,1:].describe()` in `print()` ensures that the output is printed out neatly. While calling `.describe()` alone in an interactive environment like a Jupyter notebook automatically formats the output nicely, using `print()` can be necessary in script-based environments to explicitly display the output.
+
+### What Does `describe()` Return?
+
+The `.describe()` method typically returns the following statistics:
+- **count**: The number of non-null entries.
+- **mean**: The mean of the entries.
+- **std**: Standard deviation, a measure of the dispersion of the dataset.
+- **min**: The minimum value.
+- **25% (first quartile)**: The value below which 25% of the data falls.
+- **50% (median, second quartile)**: The median value of the dataset.
+- **75% (third quartile)**: The value below which 75% of the data falls.
+- **max**: The maximum value.
+
+For example, if your DataFrame has several numerical columns from the second column onwards, the output will look something like this:
+
+```plaintext
+               Age        Salary
+count   100.000000    100.000000
+mean     35.500000  55000.000000
+std      10.388303   5000.000000
+min      20.000000  45000.000000
+25%      27.750000  51000.000000
+50%      35.500000  55000.000000
+75%      43.250000  59000.000000
+max      50.000000  65000.000000
+```
+
+This provides a quick and useful summary of the data, highlighting key trends and outliers, and is especially helpful for initial exploratory data analysis.
+
+## Step 3: Feature Engineering
+```
 cat_cols = df.select_dtypes('object').columns.to_list()
+```
+`cat_cols = df.select_dtypes('object').columns.to_list()` creates a list named cat_cols that contains the names of all columns in df whose data type is object. This is particularly useful when you need to perform operations specifically on categorical data, such as encoding these categories into numbers for machine learning purposes, filtering, or specific data manipulations involving text.
+```
+#filter categoricals variables from df which only contain two different values
+df_cat = df.select_dtypes(include=['object']) #subset all the columns with data type object
+cat_cols_2_vals = df_cat.nunique() 
+cat_cols_2_vals = cat_cols_2_vals[cat_cols_2_vals == 2].index.to_list()
+```
+Let's break down the code step by step:
 
-# filter categoricals variables from df which only contain two different values
+- **Step 1:** Selecting Categorical Columns
+```python
+df_cat = df.select_dtypes(include=['object'])
+```
+- **`df.select_dtypes(include=['object'])`**: This method is used to filter the DataFrame to include only columns of specific data types, in this case, 'object'. Typically, 'object' datatype in pandas is used for columns that contain text or mixed types but is often used for categorical data.
+- **`df_cat`**: This new DataFrame now contains only the columns from `df` that are of type 'object'.
+
+- **Step 2:** Counting Unique Values in Each Column
+```python
+cat_cols_2_vals = df_cat.nunique()
+```
+- **`df_cat.nunique()`**: This function calculates the number of unique values in each column of the DataFrame `df_cat`. The result is a Series where the index corresponds to the column names and the values are the counts of unique entries in those columns.
+
+- **Step 3:** Filtering Columns with Exactly Two Unique Values
+```python
+cat_cols_2_vals = cat_cols_2_vals[cat_cols_2_vals == 2].index.to_list()
+```
+- **`cat_cols_2_vals == 2`**: This condition checks which entries in the Series `cat_cols_2_vals` are equal to 2, meaning the columns that have exactly two unique values.
+- **`.index.to_list()`**: After filtering the Series to retain only the columns with exactly two unique values, this part retrieves the names of these columns by accessing the index of the filtered Series and then converting it to a list.
+
+**What Does This Achieve?**
+The final output stored in the variable `cat_cols_2_vals` is a list of column names from the original DataFrame `df` that are categorical (of type 'object') and have exactly two unique values. This can be particularly useful in scenarios like binary classification tasks in machine learning, where you might need to handle binary features differently, such as converting them into a format that a model can understand (e.g., using 0/1 encoding).
+
+- **Example Usage:**
+Here’s a brief example to demonstrate this:
+```python
+import pandas as pd
+
+# Example DataFrame
+data = {
+    'Gender': ['Male', 'Female', 'Male', 'Female'],
+    'City': ['New York', 'Los Angeles', 'New York', 'Miami'],
+    'Status': ['Single', 'Married', 'Married', 'Single']
+}
+
+df = pd.DataFrame(data)
+
+# Filtering object-type columns with exactly two unique values
 df_cat = df.select_dtypes(include=['object'])
 cat_cols_2_vals = df_cat.nunique()
 cat_cols_2_vals = cat_cols_2_vals[cat_cols_2_vals == 2].index.to_list()
 
-cat_cols = set(cat_cols) ^ set(cat_cols_2_vals)  # find not intersected elements
+# Output the result
+print(cat_cols_2_vals)
+```
 
-# extract prediction labels
+The output will be:
+```plaintext
+['Gender', 'Status']
+```
+These columns ('Gender' and 'Status') each have exactly two distinct values and can be used accordingly in further data processing or analysis tasks.
+
+```
+cat_cols = set(cat_cols) ^ set(cat_cols_2_vals)  # find not intersected elements
+```
+- **Step 1:** Convert Lists to Sets
+- **`set(cat_cols)`** and **`set(cat_cols_2_vals)`**: These convert the lists `cat_cols` and `cat_cols_2_vals` into sets. Sets in Python are collections of unique elements and support mathematical operations like unions, intersections, and differences.
+
+- **Step 2:** Symmetric Difference Operation
+- **`^`** (caret symbol) is the operator for symmetric difference between two sets. The symmetric difference between two sets is the set of elements that are in either of the sets, but not in their intersection. In simpler terms, it includes elements from both sets that are not common to both.
+
+**Practical Meaning**
+If `cat_cols` contains the names of all columns that were identified as categorical (i.e., columns of type 'object') and `cat_cols_2_vals` contains the names of categorical columns with exactly two unique values, then using the symmetric difference operation (`^`) will result in a set of column names with more or less than two unique values (present in `cat_cols` but not in `cat_cols_2_vals`).
+
+- **Example**
+Suppose you have the following:
+```python
+cat_cols = ['Gender', 'City', 'Status']
+cat_cols_2_vals = ['Gender', 'Status']
+```
+Performing the operation:
+```python
+cat_cols = set(cat_cols) ^ set(cat_cols_2_vals)
+```
+Will yield:
+```python
+{'City'}
+```
+This set includes the column(s) that are either in `cat_cols` or in `cat_cols_2_vals` but not in both. Here, 'City' appears in `cat_cols` (all categorical columns) but not in `cat_cols_2_vals` (categorical columns with exactly two unique values), indicating it is a categorical column with a different number of unique values than two.
+This operation is particularly useful when you need to segregate categorical columns based on their properties (like number of unique values) for specific preprocessing steps in data analysis or machine learning workflows.
+
+### Extract prediction labels
+```
 labels = df['ripe'].unique().tolist()
 
 for col in cat_cols:
     df = pd.concat([df.drop(col, axis=1), pd.get_dummies(df[col], prefix=col)], axis=1)
+```
+The code provided performs two main operations on a pandas DataFrame `df`. It first extracts unique values from a column named `'ripe'` and then manipulates the DataFrame by converting categorical columns into dummy/one-hot encoded columns. Let’s break down the operations:
 
-# BOOLEAN TYPE FEATURES (YES /NO)
+**Step 1:** Extracting Unique Values from a Column
+```python
+labels = df['ripe'].unique().tolist()
+```
+- **`df['ripe'].unique()`**: This extracts the unique values from the column named `'ripe'` in the DataFrame `df`. The `unique()` function returns a numpy array of all unique values in the specified column.
+- **`.tolist()`**: This converts the array of unique values into a Python list. The resulting list, `labels`, contains all unique values that appear in the `'ripe'` column.
+
+**Step 2:** Transforming Categorical Columns into Dummy Variables
+```python
+for col in cat_cols:
+    df = pd.concat([df.drop(col, axis=1), pd.get_dummies(df[col], prefix=col)], axis=1)
+```
+- **Loop Over `cat_cols`**: The loop iterates over each column name stored in the list `cat_cols`. These are presumably the names of categorical columns that you want to transform into dummy variables.
+- **`df.drop(col, axis=1)`**: Inside the loop, this method removes the current column (`col`) from `df`. The `axis=1` parameter specifies that columns (not rows) should be dropped.
+- **`pd.get_dummies(df[col], prefix=col)`**: This function converts the categorical column into dummy/one-hot encoded columns. For each unique value in the column, a new binary column is created. The `prefix=col` argument adds the original column name as a prefix to each new dummy column name to maintain clarity on what the dummy columns represent.
+- **`pd.concat([...], axis=1)`**: This concatenates two DataFrames along `axis=1` (i.e., horizontally). It combines the DataFrame with the dropped column and the newly created dummy columns into a single DataFrame.
+- **Assignment to `df`**: The result of the concatenation is assigned back to `df`, updating it with the transformed data.
+
+**Important Note**
+- The loop reassigns `df` in every iteration, which could be computationally expensive for large DataFrames. It's more efficient to prepare transformations and then apply them all at once if possible.
+- You also have to ensure that `cat_cols` does not contain the column `'ripe'` if you still need it for other operations because it might get modified or dropped in the process. 
+
+### BOOLEAN TYPE FEATURES (YES /NO)
+```
 for col in cat_cols_2_vals:
     df[col + '_new'] = df[col].apply(lambda x: 1 if x == 'hard' else 0)
     df.drop(col, axis=1, inplace=True)
 
 print(df.info())
+```
+The code snippet provided transforms specific categorical columns in a pandas DataFrame by creating new columns based on the values in these categorical columns, and then it removes the original columns. Here's a detailed breakdown of what each line in this loop does:
 
+**Create New Columns Based on Condition**
+```python
+df[col + '_new'] = df[col].apply(lambda x: 1 if x == 'hard' else 0)
+```
+- **`df[col + '_new']`**: This creates a new column in `df` with the name of the original column plus the suffix `_new`.
+- **`df[col].apply(lambda x: 1 if x == 'hard' else 0)`**: This line applies a function to each element in the column named `col`. The function uses a lambda expression that checks if the value `x` is `'hard'`. If `x` equals `'hard'`, the function returns `1`; otherwise, it returns `0`. This effectively creates a binary indicator variable where `1` indicates the presence of the value `'hard'` and `0` indicates any other value.
+
+**Remove the Original Columns**
+```python
+df.drop(col, axis=1, inplace=True)
+```
+- **`df.drop(col, axis=1, inplace=True)`**: This method removes the column named `col` from `df`. The parameter `axis=1` specifies that columns (not rows) are to be dropped. The `inplace=True` argument tells pandas to perform the operation in-place and modify `df` directly, so you do not need to assign the result back to `df`.
+```
 x = df.drop(['ID','ripe'], axis=1)
 cols_x=x.columns
 y = np.array(df[['ripe']]).flatten() # Adjust to get 1d array
 ###################
-# Plot the data 
+### Plot the data 
 ###################
 # plot size
 plt.figure(1, figsize=(15, 8))
@@ -103,6 +303,37 @@ plt.ylabel("sugar")
 plt.xlabel("density")
 plt.title('Watermelon 3.0')
 plt.show()
+```
+The code snippet provided shows how to prepare and plot data from a pandas DataFrame, specifically for visualizing relationships between two features (`density` and `sugar`) with color-coding based on another feature (`ripe`). Let's go through your code step-by-step and see how it works:
+
+**Step 1:** Data Preparation
+```python
+x = df.drop(['ID','ripe'], axis=1)
+cols_x = x.columns
+y = np.array(df[['ripe']]).flatten() # Adjust to get 1d array
+```
+- **`df.drop(['ID','ripe'], axis=1)`**: This drops the 'ID' and 'ripe' columns from the DataFrame `df`, presumably because they are not needed for the subsequent analysis or visualization. The resulting DataFrame `x` contains the remaining columns.
+- **`cols_x = x.columns`**: Stores the column names of `x`, although it's not used later in the provided snippet.
+- **`y = np.array(df[['ripe']]).flatten()`**: This converts the 'ripe' column from `df` into a numpy array and flattens it to a 1-dimensional array. This array `y` is used for color-coding the data points in the scatter plot.
+
+**Step 2:** Plotting the Data
+```python
+plt.figure(1, figsize=(15, 8))
+scatter = plt.scatter(df[['density']], df[['sugar']], c=y)
+plt.legend(handles=scatter.legend_elements()[0], labels=["False", "True"])
+plt.ylabel("sugar")
+plt.xlabel("density")
+plt.title('Watermelon 3.0')
+plt.show()
+```
+- **`plt.figure(1, figsize=(15, 8))`**: Sets up a figure object for the plot, specifying its size.
+- **`plt.scatter(df[['density']], df[['sugar']], c=y)`**: Creates a scatter plot where the `density` values are plotted on the x-axis and `sugar` values on the y-axis. The `c=y` argument uses the array `y` for color-coding the data points based on whether the watermelons are ripe.
+- **`plt.legend(...)`**: Adds a legend to the plot. The `scatter.legend_elements()` function automatically generates legend handles based on the unique values in `y`, which are labeled as "False" and "True". This indicates whether the watermelons are not ripe or ripe, respectively.
+- **`plt.ylabel("sugar")`**, **`plt.xlabel("density")`**, and **`plt.title('Watermelon 3.0')`**: Label the axes and add a title to the plot.
+- **`plt.show()`**: Displays the plot.
+
+This plot visualizes the relationship between `density` and `sugar` content of watermelons, with the ripeness depicted by different colors. It's a common practice in exploratory data analysis to understand how different features relate to a categorical outcome (like ripeness).  
+This visualization could help in understanding patterns or clustering that might indicate which factors contribute to a watermelon being considered ripe.
 
 ##################
 # Scaling data
