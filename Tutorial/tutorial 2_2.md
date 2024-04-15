@@ -1,4 +1,12 @@
 # Tutorial 2 
+## Contents
+1. [Importing Packages, Functions & Classes](#step-1-import-packages-functions-and-classes)
+2. [EDA,](#step-2-get-data-and-transform-the-columns) [Feature Engineering, Plotting ](#feature-engineering) & [Scaling Data](#scaling-data)
+3. [Creating a Model & Train It(Logistic Regression)](#step-3-create-a-model-and-train-it-linear-discriminant-analysis)
+4. [Evaluate the Model](#step-4-evaluate-the-model)
+5. [Improve the Model](#step-5-improve-the-model)
+6. [Plot the Model](#step-6-plot-the-model)
+
 
 
 ## Step 1: Import Packages, Functions, and Classes
@@ -18,6 +26,7 @@ import os
 ```
 
 ## Step 2: Get Data and transform the columns
+### Exploratory Data Analysis
 1. Change the working directory to your current directory, preferably where all the csv files are also available, so that when you type in pathname, you don't have to type in the whole directory!
 ```
 os.chdir("/Users/adhitchandy/Library/CloudStorage/OneDrive-M365UniversitätHamburg/Semester 4/Machine Learning/Tutorial")
@@ -91,7 +100,7 @@ dtypes: float64(1), int64(1), object(1)
 Memory usage: 248.0+ bytes
 ```
 
-### Key Details in the Output:
+**Key Details in the Output:**
 - **Class Type**: Shows that the object is a DataFrame.
 - **Index Range**: Indicates the range of index labels.
 - **Columns**:
@@ -112,7 +121,7 @@ The command `print(df.iloc[:,1:].describe())` in pandas performs a detailed stat
 3. **Printing the Output**: 
    - Wrapping `df.iloc[:,1:].describe()` in `print()` ensures that the output is printed out neatly. While calling `.describe()` alone in an interactive environment like a Jupyter notebook automatically formats the output nicely, using `print()` can be necessary in script-based environments to explicitly display the output.
 
-### What Does `describe()` Return?
+**What Does `describe()` Return?**
 
 The `.describe()` method typically returns the following statistics:
 - **count**: The number of non-null entries.
@@ -140,7 +149,7 @@ max      50.000000  65000.000000
 
 This provides a quick and useful summary of the data, highlighting key trends and outliers, and is especially helpful for initial exploratory data analysis.
 
-## Step 3: Feature Engineering
+### Feature Engineering
 ```
 cat_cols = df.select_dtypes('object').columns.to_list()
 ```
@@ -306,17 +315,15 @@ plt.show()
 ```
 The code snippet provided shows how to prepare and plot data from a pandas DataFrame, specifically for visualizing relationships between two features (`density` and `sugar`) with color-coding based on another feature (`ripe`). Let's go through your code step-by-step and see how it works:
 
-**Step 1:** Data Preparation
 ```python
 x = df.drop(['ID','ripe'], axis=1)
 cols_x = x.columns
 y = np.array(df[['ripe']]).flatten() # Adjust to get 1d array
 ```
 - **`df.drop(['ID','ripe'], axis=1)`**: This drops the 'ID' and 'ripe' columns from the DataFrame `df`, presumably because they are not needed for the subsequent analysis or visualization. The resulting DataFrame `x` contains the remaining columns.
-- **`cols_x = x.columns`**: Stores the column names of `x`, although it's not used later in the provided snippet.
+- **`cols_x = x.columns`**: Stores the column names of `x`, used in the [scaling part](#scaling-data)
 - **`y = np.array(df[['ripe']]).flatten()`**: This converts the 'ripe' column from `df` into a numpy array and flattens it to a 1-dimensional array. This array `y` is used for color-coding the data points in the scatter plot.
 
-**Step 2:** Plotting the Data
 ```python
 plt.figure(1, figsize=(15, 8))
 scatter = plt.scatter(df[['density']], df[['sugar']], c=y)
@@ -335,9 +342,8 @@ plt.show()
 This plot visualizes the relationship between `density` and `sugar` content of watermelons, with the ripeness depicted by different colors. It's a common practice in exploratory data analysis to understand how different features relate to a categorical outcome (like ripeness).  
 This visualization could help in understanding patterns or clustering that might indicate which factors contribute to a watermelon being considered ripe.
 
-##################
-# Scaling data
-##################
+### Scaling data
+```
 from sklearn.preprocessing import StandardScaler
 
 # Data standardization to rescale attributes so that they have mean 0 and variance 1 -> (x -mean)/ std
@@ -345,7 +351,19 @@ from sklearn.preprocessing import StandardScaler
 scaler = StandardScaler()
 x = scaler.fit_transform(x)
 X = pd.DataFrame(x, columns=cols_x)
+```
 
+**Breakdown of the StandardScaler Section**:
+    ```python
+    from sklearn.preprocessing import StandardScaler
+    scaler = StandardScaler()
+    x = scaler.fit_transform(x)
+    X = pd.DataFrame(x, columns=cols_x)
+    ```
+    - **`StandardScaler()`** creates an instance of StandardScaler, which standardizes features by removing the mean and scaling to unit variance. This standardization ensures that each feature contributes equally to the analysis, particularly important for models like SVM, k-NN, and logistic regression.
+    - **`fit_transform(x)`**: This fits the scaler to your data `x` and then transforms it. `fit_transform()` is a combination of `fit()` (to calculate the necessary statistics, i.e., mean and std deviation) and `transform()` (to apply the standardization by subtracting the mean and dividing by the std deviation).
+    - **`pd.DataFrame(x, columns=cols_x)`**: Recreates a DataFrame from the array returned by `fit_transform`, using `cols_x` to label the columns. This is useful because `fit_transform` returns a NumPy array, and you might want to convert this array back to a DataFrame for easier handling and to use DataFrame functionalities.
+```
 # plot size
 plt.figure(1, figsize=(15, 8))
 # plotting the data 
@@ -355,6 +373,19 @@ plt.ylabel("sugar")
 plt.xlabel("density")
 plt.title('Watermelon 3.0 scaled')
 plt.show()
+```
+- The plotting code is similar to the previous example but now uses the standardized data stored in `X`.
+- **`scatter = plt.scatter(X[['density']], X[['sugar']], c=y)`**: Plots the scatter plot where `density` and `sugar` are now standardized features. Color-coding (`c=y`) remains based on the ripeness from your original DataFrame.
+- **`plt.legend(...)`**, **`plt.ylabel(...)`**, **`plt.xlabel(...)`**, and **`plt.title(...)`**: These commands add a legend, label axes, and set the title of the plot, respectively.
+- **`plt.show()`**: Displays the plot.
+
+**Benefits of Standardization**
+- **Equal Importance**: Standardizing the data gives all features the same importance due to scaling.
+- **Performance Improvement**: Many machine learning algorithms perform better or converge faster when features are on a relatively similar scale and close to normally distributed.
+
+**Visual Interpretation**
+- **Scaled Plot**: The axes in the plot of scaled data may not reflect the actual densities and sugar content values but rather how many standard deviations those values are from their respective means. This might make the plot less interpretable in terms of actual values but more useful for spotting trends and relationships in the context of machine learning.  
+This adjustment is particularly insightful if you plan to apply machine learning techniques where scale and distribution of the data could impact performance.
 
 # %%
 ############################################################
