@@ -355,14 +355,14 @@ X = pd.DataFrame(x, columns=cols_x)
 ```
 
 **Breakdown of the StandardScaler Section**:
-    ```python
-    from sklearn.preprocessing import StandardScaler
-    scaler = StandardScaler()
-    x_scaled = scaler.fit_transform(x[num_cols])
-    x = pd.concat([x.drop(columns=num_cols), pd.DataFrame(x_scaled, columns=num_cols, index=x.index)], axis=1)
-    X = pd.DataFrame(x, columns=cols_x)
-    ```
-   The code snippet you've provided is a good example of how to apply standardization to a subset of columns in a pandas DataFrame using `StandardScaler` from the `sklearn.preprocessing` package. Let's break down each part of the process to understand what it accomplishes:
+```
+from sklearn.preprocessing import StandardScaler
+scaler = StandardScaler()
+x_scaled = scaler.fit_transform(x[num_cols])
+x = pd.concat([x.drop(columns=num_cols), pd.DataFrame(x_scaled, columns=num_cols, index=x.index)], axis=1)
+X = pd.DataFrame(x, columns=cols_x)
+```
+The code snippet you've provided is a good example of how to apply standardization to a subset of columns in a pandas DataFrame using `StandardScaler` from the `sklearn.preprocessing` package. Let's break down each part of the process to understand what it accomplishes:
 
 **Initialize the StandardScaler**
 ```python
