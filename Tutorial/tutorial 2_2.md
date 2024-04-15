@@ -1,13 +1,12 @@
 # Tutorial 2 
 
+
+### Step 1: Import Packages, Functions, and Classes
 The following line of codes import the necessary packages functions and classes for this exercise. 
+
 ```
 globals().clear()
 
-####################################################
-
-# Step 1: Import Packages, Functions, and Classes
-####################################################
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -17,28 +16,48 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
 import os
 ```
-# %%
-####################################################
-# Step 2: Get Data and transform the columns
-####################################################
+
+### Step 2: Get Data and transform the columns
+1. Change the working directory to your current directory, preferably where all the csv files are also available, so that when you type in pathname, you don't have to type in the whole directory!
+```
 os.chdir("/Users/adhitchandy/Library/CloudStorage/OneDrive-M365UniversitätHamburg/Semester 4/Machine Learning/Tutorial")
+```
+Reading any csv file using `pd.read_csv(pathname)` works usually. But here since the encoding of the csv file is not the default `UTF-8`, but `UTF-16` we have to specify the econding mechanism to open the file properly, otherwise it return NaNs. 
 
-raw_data = pd.read_csv("watermelon_3_1.csv", encoding='utf-16le')
-df=raw_data
-print(df)
+```
+df=pd.read_csv("watermelon_3_1.csv", encoding='utf-16le')
+```
+In Python's pandas library, when you use `df.shape` to get the dimensions of a DataFrame, shape is an __attribute__ of the DataFrame object df. The .shape attribute returns a tuple representing the dimensions of the DataFrame, where the first element of the tuple is the number of rows and the second is the number of columns.
 
-
-#%%
+```
 print(f'The shape of the dataframe is {df.shape}')
 print(df.columns.to_list())
+```
 
-# check for any null values
+2. Check for any null values:  
+The following code tells you how many non-missing values exist in each column where at least one column in the row has a missing value. If you are analyzing data quality or data completeness, this information helps identify which columns in your potentially problematic rows are most often complete.
+```
 print(df[df.isnull().any(axis=1)].count())
+```
+The code df[df.isnull().any(axis=1)].count() is used in pandas to perform a couple of specific operations regarding the handling of missing data. Here's a step-by-step breakdown of what each part of this expression does and the overall result:
 
+a. df.isnull(): This method returns a DataFrame of the same shape as df, where each element is True if the corresponding element in df is NaN or null, and False otherwise.
+b. any(axis=1): This is applied to the DataFrame returned by df.isnull(). It checks each row to determine if there's at least one True value in that row (i.e., if there's at least one null value in that row). The result is a Series of boolean values where each value corresponds to a row in df. The value is True if there's at least one NaN in the row, and False otherwise.
+c. df[df.isnull().any(axis=1)]: This uses the boolean Series to filter the original DataFrame df. It selects only those rows where the Series has True values, meaning it selects rows that contain at least one NaN.
+d. count(): This method is applied to the DataFrame that has been filtered to include only rows with one or more NaN values. It counts the non-null values in each column of this filtered DataFrame. Unlike methods like sum() which would add up values, count() tells you how many entries in each column are not null among the rows that were selected because they have at least one null.
+
+*Another way to check for null values would be: `print(df.isnull().sum())` and this would give a df in which it says how many values are `NaN` in each column.*
+
+3. Rewriting the existing dataframe with a new dataframe so that the rows (`axis=0`) with `any` null values are dropped. 
+```
 df = df.dropna(how='any',axis=0) 
+```
 
-# check for class imbalance
+4. Check for class imbalance:
+
+```
 print(df['ripe'].value_counts())
+```
 
 # Summary stats of data
 print(df.info())
