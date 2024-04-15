@@ -41,10 +41,10 @@ print(df[df.isnull().any(axis=1)].count())
 ```
 The code df[df.isnull().any(axis=1)].count() is used in pandas to perform a couple of specific operations regarding the handling of missing data. Here's a step-by-step breakdown of what each part of this expression does and the overall result:
 
-a. df.isnull(): This method returns a DataFrame of the same shape as df, where each element is True if the corresponding element in df is NaN or null, and False otherwise.
-b. any(axis=1): This is applied to the DataFrame returned by df.isnull(). It checks each row to determine if there's at least one True value in that row (i.e., if there's at least one null value in that row). The result is a Series of boolean values where each value corresponds to a row in df. The value is True if there's at least one NaN in the row, and False otherwise.
-c. df[df.isnull().any(axis=1)]: This uses the boolean Series to filter the original DataFrame df. It selects only those rows where the Series has True values, meaning it selects rows that contain at least one NaN.
-d. count(): This method is applied to the DataFrame that has been filtered to include only rows with one or more NaN values. It counts the non-null values in each column of this filtered DataFrame. Unlike methods like sum() which would add up values, count() tells you how many entries in each column are not null among the rows that were selected because they have at least one null.
+    a. df.isnull(): This method returns a DataFrame of the same shape as df, where each element is True if the corresponding element in df is NaN or null, and False otherwise.
+    b. any(axis=1): This is applied to the DataFrame returned by df.isnull(). It checks each row to determine if there's at least one True value in that row (i.e., if there's at least one null value in that row). The result is a Series of boolean values where each value corresponds to a row in df. The value is True if there's at least one NaN in the row, and False otherwise.
+    c. df[df.isnull().any(axis=1)]: This uses the boolean Series to filter the original DataFrame df. It selects only those rows where the Series has True values, meaning it selects rows that contain at least one NaN.
+    d. count(): This method is applied to the DataFrame that has been filtered to include only rows with one or more NaN values. It counts the non-null values in each column of this filtered DataFrame. Unlike methods like sum() which would add up values, count() tells you how many entries in each column are not null among the rows that were selected because they have at least one null.
 
 *Another way to check for null values would be: `print(df.isnull().sum())` and this would give a df in which it says how many values are `NaN` in each column.*
 
