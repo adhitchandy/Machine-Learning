@@ -585,7 +585,7 @@ plt.title('Confusion matrix for Logistic Regression for the Watermelon 3.0 data'
 plt.show()
 ```
 - **`plt.title`**: Sets the title of the plot.
-- **`plt.show()`**: Displays the figure with all its elements. This function call is necessary to actually render the visualization when not using interactive environments like Jupyter notebooks.
+- **`plt.show()`**: Displays the figure with all its elements. This function call is necessary to actually render the visualization when not using interactive environments like Jupyter notebooks.  
 ![heatmap1](image-2.png)
 
 **Summary:** This code effectively visualizes the confusion matrix as a heatmap, enhancing interpretation by annotating each cell with the corresponding count of predictions, making it clear how many and what type of errors the logistic regression model is making. Such visualizations are crucial for understanding model performance beyond scalar metrics like accuracy.
