@@ -15,7 +15,7 @@ import os
 ####################################################
 # Step 2: Get Data and transform the columns
 ####################################################
-os.chdir("Desktop/machine_learning_tutorial")
+os.chdir("/Users/adhitchandy/Library/CloudStorage/OneDrive-M365UniversitätHamburg/Semester 4/Machine Learning/Tutorial/data")
 
 raw_data = pd.read_csv("watermelon_3_1.csv",encoding='utf-16le')
 df=raw_data
@@ -137,7 +137,7 @@ print(f'Classification Report: {classification_report(y, y_pred_logreg)}')
 
 print(logreg.predict_proba(X)) # Predicted Output False/True 
 print(logreg.predict(X)) #Actual Predictions
-
+#%%
 # Cofusion matrix as heat map 
 cm = confusion_matrix(y, y_pred_logreg)
 fig, ax = plt.subplots(figsize=(3, 3))
