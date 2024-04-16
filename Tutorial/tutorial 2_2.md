@@ -260,7 +260,7 @@ for col in cat_cols:
 - You also have to ensure that `cat_cols` does not contain the column `'ripe'` if you still need it for other operations because it might get modified or dropped in the process. 
 
 ### BOOLEAN TYPE FEATURES (YES /NO)
-```
+```python
 for col in cat_cols_2_vals:
     df[col + '_new'] = df[col].apply(lambda x: 1 if x == 'hard' else 0)
     df.drop(col, axis=1, inplace=True)
@@ -281,7 +281,7 @@ df[col + '_new'] = df[col].apply(lambda x: 1 if x == 'hard' else 0)
 df.drop(col, axis=1, inplace=True)
 ```
 - **`df.drop(col, axis=1, inplace=True)`**: This method removes the column named `col` from `df`. The parameter `axis=1` specifies that columns (not rows) are to be dropped. The `inplace=True` argument tells pandas to perform the operation in-place and modify `df` directly, so you do not need to assign the result back to `df`.
-```
+```python
 x = df.drop(['ID','ripe'], axis=1)
 cols_x=x.columns
 y = np.array(df[['ripe']]).flatten() # Adjust to get 1d array
@@ -340,7 +340,7 @@ X = pd.DataFrame(x, columns=cols_x)
 ```
 
 **Breakdown of the StandardScaler Section**:
-```
+```python
 from sklearn.preprocessing import StandardScaler
 scaler = StandardScaler()
 x_scaled = scaler.fit_transform(x[num_cols])
@@ -380,7 +380,7 @@ X = pd.DataFrame(x, columns=cols_x)
 The process effectively standardizes only the numerical columns of a DataFrame while leaving other columns untouched. This is particularly useful in machine learning preprocessing, where standardization of features is often required for models like linear regression, logistic regression, and neural networks, among others.
 
 This approach ensures that the scaling transformation does not distort relationships among numerical features and that these features contribute equally to model training, improving the performance of algorithms sensitive to the scale of input data.
-```
+```python
 # plot size
 plt.figure(1, figsize=(15, 8))
 # plotting the data 
@@ -412,7 +412,56 @@ logreg = LogisticRegression(solver='liblinear', C=10.0, random_state=0)
 logreg_result = logreg.fit(X, y)
 y_pred_logreg = logreg.predict(X)
 ```
-In this step, a logistic regression model is instantiated with `liblinear` solver and a high regularization strength (`C=10.0`). The model is then trained on the scaled feature set `X` and the target variable `y`. Predictions are also made on the same dataset to evaluate performance in subsequent steps.
+In this step, a logistic regression model is instantiated with `liblinear` solver. The model is then trained on the scaled feature set `X` and the target variable `y`. Predictions are also made on the same dataset to evaluate performance in subsequent steps.
+The code snippet you've provided is used to instantiate, train, and inspect a logistic regression model using `scikit-learn`. Here's a breakdown of each component and what it does:
+
+**Code Explanation**
+
+```python
+logreg = LogisticRegression(solver='liblinear', C=10.0, random_state=0)
+```
+- **`LogisticRegression()`** is the constructor for creating a logistic regression model.
+- **`solver='liblinear'`**: Specifies the algorithm used for optimization. 'liblinear' is good for small datasets and binary classification. It is one of several algorithms available (`'newton-cg'`, `'lbfgs'`, `'sag'`, `'saga'`), each suitable for different types of problems.
+- **`C=10.0`**: Sets the inverse of the regularization strength. In logistic regression and other models where regularization is used, the parameter `C` in the `LogisticRegression` function of `scikit-learn` represents the inverse of regularization strength. **A smaller value of `C` specifies stronger regularization**. This means that:
+  - **Larger values of `C`**: Weaken the regularization effect. This allows the model coefficients to grow larger, which means the model can fit the training data more closely but may risk overfitting if `C` is too large.
+  - **Smaller values of `C`**: Strengthen the regularization effect. This restricts the size of the coefficients, pushing the model toward simpler models that may generalize better but at the risk of underfitting if `C` is too small.  
+    Given this:
+  - If `C` is set to 10.0, it implies **less regularization** compared to the default value of 1.0. This setting allows the coefficients more freedom to fit the model to the training data, potentially capturing more complex patterns but also increasing the risk of overfitting.
+
+- **`random_state=0`**: Ensures reproducibility of the results by specifying the seed for the random number generator that the solver uses.
+
+```python
+logreg_result = logreg.fit(X, y)
+```
+- **`fit(X, y)`**: This method trains the logistic regression model using the feature matrix `X` and the target vector `y`. The model learns to associate the features with the target.
+
+```python
+y_pred_logreg = logreg.predict(X)
+```
+- **`predict(X)`**: After training the model, this function is used to predict the target for the provided features `X`. It outputs the predicted labels based on the learned coefficients.
+
+**Inspecting Model Attributes**
+
+```python
+print(
+    "Classes: ", logreg.classes_, "\n",
+    "Intercept: ", logreg.intercept_, "\n",
+    "Coefficients: ", logreg.coef_
+)
+```
+- **`logreg.classes_`**: Displays the array of distinct values that `y` can have. In logistic regression, this will show the classes for which the model is trained to predict.
+- **`logreg.intercept_`**: Represents the intercept (a.k.a. bias) term(s) of the decision function. In logistic regression, the intercept shifts the decision boundary away from the origin and is not regularized.
+- **`logreg.coef_`**: This attribute holds the coefficients of the features in the decision function. These coefficients represent the relationship between each feature and the log-odds of the positive class, adjusting for all other features. Each feature’s coefficient tells you how its log-odds are expected to change with a one-unit change in the feature, holding other features constant.
+
+**Summary:** This logistic regression setup and the subsequent inspection of its attributes provide valuable insights into the trained model. The coefficients and intercept can be particularly insightful for understanding the impact of each feature on the probability of predicting the positive class under the logistic regression model.  
+Here the **output** would be:
+```python
+Classes:  [False  True] 
+ Intercept:  [-0.45470101] 
+ Coefficients:  [[ 0.62121032 -0.78200759 -0.50701884 -0.85198509  0.90430292 -1.84677316
+   1.2127952   0.17927694 -1.35142388  2.04984052 -1.15311765  0.89155618
+  -0.83923835 -0.50701884  0.76468066 -0.21300983 -1.00637185 -0.98674281]]
+  ```
 
 ## Step 4: Evaluate the Model
 ```python
@@ -422,9 +471,50 @@ print(f'Classification Report: {classification_report(y, y_pred_logreg)}')
 print(logreg.predict_proba(X)) # Predicted probabilities
 print(logreg.predict(X)) # Actual predictions
 ```
-The model's performance is evaluated by computing its accuracy and displaying the confusion matrix and a detailed classification report, which includes precision, recall, and F1-score for each class. This step provides insights into the model's generalization capability and classification accuracy across different classes.
+The model's performance is evaluated by computing its accuracy and displaying the confusion matrix and a detailed classification report, which includes precision, recall, and F1-score for each class. This step provides insights into the model's generalization capability and classification accuracy across different classes.  
+**Code for Evaluating the Model**
 
-### Visualize Model Performance
+```python
+print(f'Accuracy: {accuracy_score(y, y_pred_logreg)}')
+```
+- **`accuracy_score(y, y_pred_logreg)`**: This function calculates the accuracy of the model, which is the proportion of correct predictions over all predictions made. This is a basic measure of performance for classification models.
+- The printed output shows the accuracy of the logistic regression model when predicting the target `y` based on features `X`. Higher accuracy indicates better performance, but it's essential to consider this metric in the context of the problem and the dataset, especially if the classes are imbalanced.
+
+```python
+print(f'Confusion Matrix: {confusion_matrix(y, y_pred_logreg)}')
+```
+- **`confusion_matrix(y, y_pred_logreg)`**: Generates a confusion matrix, which provides a summary of prediction results on a classification problem. The number of correct and incorrect predictions are summarized with count values and broken down by each class.
+- The matrix is structured as follows:
+  - **Top left**: True negatives (TN)
+  - **Top right**: False positives (FP)
+  - **Bottom left**: False negatives (FN)
+  - **Bottom right**: True positives (TP)
+- This output helps understand not just the errors being made by the classifier but also the types of errors that are occurring.
+
+```python
+print(f'Classification Report: {classification_report(y, y_pred_logreg)}')
+```
+- **`classification_report(y, y_pred_logreg)`**: This function builds a text report showing the main classification metrics, including:
+  - **Precision**: Ability of the classifier not to label as positive a sample that is negative.
+  - **Recall**: Ability to find all the positive samples.
+  - **F1-Score**: Weighted harmonic mean of precision and recall. The best value is 1 and the worst is 0.
+  - **Support**: The number of actual occurrences of the class in the specified dataset.
+- This report is beneficial for understanding the performance of the model across different classes.
+
+```python
+print(logreg.predict_proba(X)) # Predicted probabilities
+```
+- **`logreg.predict_proba(X)`**: This method returns the probability estimates for all classes for each instance in `X`. Specifically, it gives the probabilities that the predicted output is each class, according to the model.
+- For binary classification, it will return two probabilities per instance: one for the class 0 and one for class 1. This information is crucial for tasks where a threshold decision is needed based on the probabilities rather than just a hard classification.
+
+```python
+print(logreg.predict(X)) # Actual predictions
+```
+- **`logreg.predict(X)`**: Outputs the predicted class labels for the input features `X`. This is the final classification output from the logistic regression model, where each input feature vector from `X` is labeled as the most likely class.
+
+**Summary:** The evaluation step is critical as it reveals how well the logistic regression model generalizes to new data and helps identify areas where the model performs well or poorly. This comprehensive assessment using accuracy, confusion matrix, classification report, and predicted probabilities provides a full picture of model performance, guiding potential improvements and validating model effectiveness.
+
+### Confunsion Matrix as Heatmap
 ```python
 cm = confusion_matrix(y, y_pred_logreg)
 fig, ax = plt.subplots(figsize=(3, 3))
@@ -440,9 +530,68 @@ plt.title('Confusion matrix for Logistic Regression for the Watermelon 3.0 data'
 plt.show()
 ```
 This block visualizes the confusion matrix using a heatmap, which helps in understanding the distribution of predicted versus actual classes—highlighting the true positives, false positives, true negatives, and false negatives in a visually intuitive manner.
+```python
+cm = confusion_matrix(y, y_pred_logreg)
+```
+- **`confusion_matrix(y, y_pred_logreg)`**: Calculates the confusion matrix from the true labels `y` and the predicted labels `y_pred_logreg`. The matrix quantifies the number of true positives, false positives, true negatives, and false negatives.
+
+```python
+fig, ax = plt.subplots(figsize=(3, 3))
+```
+- **`plt.subplots(figsize=(3, 3))`**: Creates a figure and a set of subplots (in this case, a single subplot). The `figsize=(3, 3)` argument specifies the size of the figure (3 inches by 3 inches).  
+ In the Python code snippet `fig, ax = plt.subplots(figsize=(3, 3))`, the comma is used to perform multiple assignments simultaneously, which is a feature of Python known as tuple unpacking.
+
+ Here's how it works:
+ - The `plt.subplots()` function from the `matplotlib` library generates a figure and a set of subplots (axes). By default, it returns a tuple containing a figure (`fig`) and axes (`ax`) object.
+ - The `fig, ax = ...` syntax unpacks the tuple returned by `plt.subplots()`. This means that the first element of the tuple (the figure object) is assigned to the variable `fig`, and the second element (the axes object or array of axes objects) is assigned to the variable `ax`.
+
+ This is a concise way to get access to both the figure and the axes object directly, allowing you to manipulate the plot and the layout separately.
+
+
+```python
+ax.imshow(cm)
+```
+- **`ax.imshow(cm)`**: Displays the confusion matrix as an image. By default, `imshow` visualizes the matrix with a coloring scale based on the values in the matrix.
+
+```python
+ax.grid(False)
+```
+- **`ax.grid(False)`**: Disables the grid lines on the plot. This is typically done for image displays like this to ensure that the view is not obstructed by grid lines.
+
+```python
+ax.xaxis.set(ticks=(0, 1), ticklabels=('Predicted False', 'Predicted True'))
+ax.yaxis.set(ticks=(0, 1), ticklabels=('Actual False', 'Actual True'))
+```
+- These lines set the tick marks and labels for the x-axis and y-axis. The x-axis represents the predicted labels, and the y-axis represents the actual labels. This labeling helps in easily interpreting which cell of the matrix represents which kind of prediction.
+
+```python
+ax.set_ylim(1.5, -0.5)
+```
+- **`ax.set_ylim(1.5, -0.5)`**: Adjusts the limits for the y-axis. This line is often necessary to correct the display issue where the top and bottom cells are slightly cut off in some versions of `matplotlib`.
+
+```python
+for i in range(2):
+    for j in range(2):
+        ax.text(j, i, cm[i, j], ha='center', va='center', color='red')
+```
+- This nested loop iterates over the indices of the confusion matrix (`2x2` matrix) and places text (the count from the confusion matrix) at each cell. `ax.text` puts a text label in the specified location:
+  - **`j, i`**: Specifies the x, y position to place the text (column index, row index).
+  - **`cm[i, j]`**: The text content, which is the value from the confusion matrix at that position.
+  - **`ha='center', va='center'`**: Horizontal alignment and vertical alignment of the text are centered, meaning the text is centered within each square of the matrix.
+  - **`color='red'`**: The color of the text is set to red for better visibility against most default `imshow` colormaps.
+
+```python
+plt.title('Confusion matrix for Logistic Regression for the Watermelon 3.0 data')
+plt.show()
+```
+- **`plt.title`**: Sets the title of the plot.
+- **`plt.show()`**: Displays the figure with all its elements. This function call is necessary to actually render the visualization when not using interactive environments like Jupyter notebooks.
+
+**Summary:** This code effectively visualizes the confusion matrix as a heatmap, enhancing interpretation by annotating each cell with the corresponding count of predictions, making it clear how many and what type of errors the logistic regression model is making. Such visualizations are crucial for understanding model performance beyond scalar metrics like accuracy.
 
 ### Receiver Operating Characteristic (ROC) Curve
 ```python
+from sklearn.metrics import roc_curve, roc_auc_score
 logreg_roc_auc = roc_auc_score(y, logreg.predict(X))
 fpr, tpr, thresholds = roc_curve(y, logreg.predict_proba(X)[:, 1])
 plt.figure()
