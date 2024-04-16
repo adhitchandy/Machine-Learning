@@ -2,7 +2,7 @@
 ## Contents
 1. [Importing Packages, Functions & Classes](#step-1-import-packages-functions-and-classes)
 2. [EDA,](#step-2-get-data-and-transform-the-columns) [Feature Engineering, Plotting ](#feature-engineering) & [Scaling Data](#scaling-data)
-3. [Creating a Model & Train It(Logistic Regression)](#step-3-create-a-model-and-train-it-linear-discriminant-analysis)
+3. [Creating a Model & Train It(Logistic Regression)](#step-3-create-a-model-and-train-it-logistic-regression)
 4. [Evaluate the Model](#step-4-evaluate-the-model)
 5. [Improve the Model](#step-5-improve-the-model)
 6. [Plot the Model](#step-6-plot-the-model)
@@ -50,10 +50,10 @@ print(df[df.isnull().any(axis=1)].count())
 ```
 The code df[df.isnull().any(axis=1)].count() is used in pandas to perform a couple of specific operations regarding the handling of missing data. Here's a step-by-step breakdown of what each part of this expression does and the overall result:
 
-- df.isnull(): This method returns a DataFrame of the same shape as df, where each element is True if the corresponding element in df is NaN or null, and False otherwise.
-- any(axis=1): This is applied to the DataFrame returned by df.isnull(). It checks each row to determine if there's at least one True value in that row (i.e., if there's at least one null value in that row). The result is a Series of boolean values where each value corresponds to a row in df. The value is True if there's at least one NaN in the row, and False otherwise.
-- df[df.isnull().any(axis=1)]: This uses the boolean Series to filter the original DataFrame df. It selects only those rows where the Series has True values, meaning it selects rows that contain at least one NaN.
-- count(): This method is applied to the DataFrame that has been filtered to include only rows with one or more NaN values. It counts the non-null values in each column of this filtered DataFrame. Unlike methods like sum() which would add up values, count() tells you how many entries in each column are not null among the rows that were selected because they have at least one null.
+- `df.isnull()`: This method returns a DataFrame of the same shape as df, where each element is True if the corresponding element in df is NaN or null, and False otherwise.
+- `any(axis=1)`: This is applied to the DataFrame returned by df.isnull(). It checks each row to determine if there's at least one True value in that row (i.e., if there's at least one null value in that row). The result is a Series of boolean values where each value corresponds to a row in df. The value is True if there's at least one NaN in the row, and False otherwise.
+- `df[df.isnull().any(axis=1)]`: This uses the boolean Series to filter the original DataFrame df. It selects only those rows where the Series has True values, meaning it selects rows that contain at least one NaN.
+- `count()`: This method is applied to the DataFrame that has been filtered to include only rows with one or more NaN values. It counts the non-null values in each column of this filtered DataFrame. Unlike methods like sum() which would add up values, count() tells you how many entries in each column are not null among the rows that were selected because they have at least one null.
 
 *Another way to check for null values would be: `print(df.isnull().sum())` and this would give a df in which it says how many values are `NaN` in each column.*
 
@@ -150,12 +150,12 @@ max      50.000000  65000.000000
 This provides a quick and useful summary of the data, highlighting key trends and outliers, and is especially helpful for initial exploratory data analysis.
 
 ### Feature Engineering
-```
+```python
 cat_cols = df.select_dtypes('object').columns.to_list()
 num_cols = df.select_dtypes('float').columns.to_list()
 ```
 `cat_cols = df.select_dtypes('object').columns.to_list()` creates a list named cat_cols that contains the names of all columns in df whose data type is object. This is particularly useful when you need to perform operations specifically on categorical data, such as encoding these categories into numbers for machine learning purposes, filtering, or specific data manipulations involving text.
-```
+```python
 #filter categoricals variables from df which only contain two different values
 df_cat = df.select_dtypes(include=['object']) #subset all the columns with data type object
 cat_cols_2_vals = df_cat.nunique() 
@@ -215,7 +215,7 @@ The output will be:
 ```
 These columns ('Gender' and 'Status') each have exactly two distinct values and can be used accordingly in further data processing or analysis tasks.
 
-```
+```python
 cat_cols = set(cat_cols) ^ set(cat_cols_2_vals)  # find not intersected elements
 ```
 - **Step 1:** Convert Lists to Sets
@@ -224,28 +224,12 @@ cat_cols = set(cat_cols) ^ set(cat_cols_2_vals)  # find not intersected elements
 - **Step 2:** Symmetric Difference Operation
 - **`^`** (caret symbol) is the operator for symmetric difference between two sets. The symmetric difference between two sets is the set of elements that are in either of the sets, but not in their intersection. In simpler terms, it includes elements from both sets that are not common to both.
 
-**Practical Meaning**
-If `cat_cols` contains the names of all columns that were identified as categorical (i.e., columns of type 'object') and `cat_cols_2_vals` contains the names of categorical columns with exactly two unique values, then using the symmetric difference operation (`^`) will result in a set of column names with more or less than two unique values (present in `cat_cols` but not in `cat_cols_2_vals`).
-
-- **Example**
-Suppose you have the following:
-```python
-cat_cols = ['Gender', 'City', 'Status']
-cat_cols_2_vals = ['Gender', 'Status']
-```
-Performing the operation:
-```python
-cat_cols = set(cat_cols) ^ set(cat_cols_2_vals)
-```
-Will yield:
-```python
-{'City'}
-```
-This set includes the column(s) that are either in `cat_cols` or in `cat_cols_2_vals` but not in both. Here, 'City' appears in `cat_cols` (all categorical columns) but not in `cat_cols_2_vals` (categorical columns with exactly two unique values), indicating it is a categorical column with a different number of unique values than two.
+**Practical Meaning:**
+If `cat_cols` contains the names of all columns that were identified as categorical (i.e., columns of type 'object') and `cat_cols_2_vals` contains the names of categorical columns with exactly two unique values, then using the symmetric difference operation (`^`) will result in a set of column names with more or less than two unique values (present in `cat_cols` but not in `cat_cols_2_vals`).  
 This operation is particularly useful when you need to segregate categorical columns based on their properties (like number of unique values) for specific preprocessing steps in data analysis or machine learning workflows.
 
 ### Extract prediction labels
-```
+```python
 labels = df['ripe'].unique().tolist()
 
 for col in cat_cols:
@@ -422,60 +406,43 @@ plt.show()
 - **Scaled Plot**: The axes in the plot of scaled data may not reflect the actual densities and sugar content values but rather how many standard deviations those values are from their respective means. This might make the plot less interpretable in terms of actual values but more useful for spotting trends and relationships in the context of machine learning.  
 This adjustment is particularly insightful if you plan to apply machine learning techniques where scale and distribution of the data could impact performance.
 
-# %%
-############################################################
-# Step 3: Create a Model and Train It  (LOGISTIC REGRESSION)
-############################################################
-
+## Step 3: Create a Model and Train It (Logistic Regression)
+```python
 logreg = LogisticRegression(solver='liblinear', C=10.0, random_state=0)
-# solver is a string ('liblinear' by default) that decides what solver to use for fitting the model. 
-# Other options are 'newton-cg', 'lbfgs', 'sag', and 'saga'.
+logreg_result = logreg.fit(X, y)
+y_pred_logreg = logreg.predict(X)
+```
+In this step, a logistic regression model is instantiated with `liblinear` solver and a high regularization strength (`C=10.0`). The model is then trained on the scaled feature set `X` and the target variable `y`. Predictions are also made on the same dataset to evaluate performance in subsequent steps.
 
-#random_state is an integer, an instance of numpy.RandomState, or None (default) 
-#that defines what pseudo-random number generator to use.
-
-# C is a positive floating-point number (1.0 by default) that defines the relative strength of regularization. 
-# Smaller values indicate stronger regularization.
-
-logreg_result=logreg.fit(X, y)
-y_pred_logreg=logreg.predict(X)
-
-# Quick look at the attributes
-print(
-      "Classes: ", logreg.classes_, "\n",
-      "Intercept: ", logreg.intercept_,"\n",
-      "Coefficients: ", logreg.coef_
-      )
-
-#%%
-####################################################
-# Step 4: Evaluate the Model
-####################################################
-
+## Step 4: Evaluate the Model
+```python
 print(f'Accuracy: {accuracy_score(y, y_pred_logreg)}')
 print(f'Confusion Matrix: {confusion_matrix(y, y_pred_logreg)}')
 print(f'Classification Report: {classification_report(y, y_pred_logreg)}')
+print(logreg.predict_proba(X)) # Predicted probabilities
+print(logreg.predict(X)) # Actual predictions
+```
+The model's performance is evaluated by computing its accuracy and displaying the confusion matrix and a detailed classification report, which includes precision, recall, and F1-score for each class. This step provides insights into the model's generalization capability and classification accuracy across different classes.
 
-print(logreg.predict_proba(X)) # Predicted Output False/True 
-print(logreg.predict(X)) #Actual Predictions
-
-# Cofusion matrix as heat map 
+### Visualize Model Performance
+```python
 cm = confusion_matrix(y, y_pred_logreg)
 fig, ax = plt.subplots(figsize=(3, 3))
 ax.imshow(cm)
 ax.grid(False)
 ax.xaxis.set(ticks=(0, 1), ticklabels=('Predicted False', 'Predicted True'))
-ax.yaxis.set(ticks=(0, 1), ticklabels=('Actual False', 'Actual Ture'))
+ax.yaxis.set(ticks=(0, 1), ticklabels=('Actual False', 'Actual True'))
 ax.set_ylim(1.5, -0.5)
 for i in range(2):
     for j in range(2):
         ax.text(j, i, cm[i, j], ha='center', va='center', color='red')
 plt.title('Confusion matrix for Logistic Regression for the Watermelon 3.0 data')
 plt.show()
+```
+This block visualizes the confusion matrix using a heatmap, which helps in understanding the distribution of predicted versus actual classes—highlighting the true positives, false positives, true negatives, and false negatives in a visually intuitive manner.
 
-
-from sklearn.metrics import roc_curve, roc_auc_score
-
+### Receiver Operating Characteristic (ROC) Curve
+```python
 logreg_roc_auc = roc_auc_score(y, logreg.predict(X))
 fpr, tpr, thresholds = roc_curve(y, logreg.predict_proba(X)[:, 1])
 plt.figure()
@@ -487,148 +454,38 @@ plt.xlabel('False Positive Rate')
 plt.ylabel('True Positive Rate')
 plt.title('Receiver operating characteristic')
 plt.legend(loc="lower right")
-plt.show()
+plt.show
 
-#%%
-####################################################
-# Step 5: Improve the Model
-####################################################
+()
+```
+This section plots the ROC curve for the logistic regression model, providing a graphical representation of the trade-off between the true positive rate and false positive rate for different threshold settings. The area under the curve (AUC) gives a single scalar value to indicate the overall performance of the model across all threshold levels.
+
+## Step 5: Improve the Model
+```python
 logreg2 = LogisticRegression(solver='liblinear', C=1, random_state=0)
-
 logreg2.fit(X, y)
-
-print(
-      "Classes: ", logreg2.classes_, "\n",
-      "Intercept: ", logreg2.intercept_,"\n",
-      "Coefficients: ", logreg2.coef_
-      )
+print("Classes: ", logreg2.classes_)
+print("Intercept: ", logreg2.intercept_)
+print("Coefficients: ", logreg2.coef_)
 print(confusion_matrix(y, logreg2.predict(X)))
 print(classification_report(y, logreg2.predict(X)))
+```
+Here, a second logistic regression model is trained with a reduced regularization strength (`C=1`), potentially allowing the model to fit the data more closely, which might improve performance depending on the underlying data characteristics. The performance metrics and model coefficients are printed for further evaluation.
 
-#%%
-##################################################
-# Step 6: Plot the model  
-#################################################
-
+## Step 6: Plot the Model
+```python
 plt.figure(1, figsize=(4, 3))
 plt.clf()
 plt.scatter(np.arange(17), y, color="black", zorder=20, marker="s", s=25)
 x_test = np.linspace(-5, 10, 300)
-
-plt.scatter(np.arange(17), logreg.predict(X), color="red", zorder=20,s=15)
-
+plt.scatter(np.arange(17), logreg.predict(X), color="red", zorder=20, s=15)
 plt.ylabel("y")
 plt.xlabel("ID")
 plt.yticks([0, 1])
-#plt.yticklabels([False,  True], minor=False)
 plt.ylim(-0.25, 1.5)
-plt.legend(
-    ("Actual value", "Predicted value"),
-    loc="upper left",
-    fontsize="small",
-)
-plt.tight_layout()
+plt.legend(("Actual value", "Predicted value"), loc="upper left", fontsize="small")
 plt.title('Logistic Regression for the Watermelon 3.0 data')
-plt.show()
-
-#%%
-######################################################################
-# Step 3: Create a Model and Train It  (LINEAR DISCRIMINANT ANALYSIS)
-######################################################################
-lda = LinearDiscriminantAnalysis()
-# solver is a string ('svd' by default) that decides what solver to use for fitting the model. 
-# ‘svd’: Singular value decomposition (default). Does not compute the covariance matrix, 
-#           therefore this solver is recommended for data with a large number of features.
-
-lda_result=lda.fit(X, y)
-y_pred_lda = lda_result.predict(X)
-
-# Quick look at the attributes
-print(
-      "Classes: ", lda.classes_, "\n",
-      "Intercept: ", lda.intercept_,"\n",
-      "Coefficients: ", lda.coef_
-      )
-
-#%%
-####################################################
-# Step 4: Evaluate the Model
-####################################################
-
-print(f'Accuracy: {accuracy_score(y, y_pred_lda)}')
-print(f'Confusion Matrix: {confusion_matrix(y, y_pred_lda)}')
-print(f'Classification Report: {classification_report(y, y_pred_lda)}')
-
-print(lda.predict_proba(X)) # Predicted Output False/True 
-print(lda.predict(X)) #Actual Predictions
-
-# Cofusion matrix as heat map 
-cm = confusion_matrix(y, y_pred_lda)
-fig, ax = plt.subplots(figsize=(3, 3))
-ax.imshow(cm)
-ax.grid(False)
-ax.xaxis.set(ticks=(0, 1), ticklabels=('Predicted False', 'Predicted True'))
-ax.yaxis.set(ticks=(0, 1), ticklabels=('Actual False', 'Actual Ture'))
-ax.set_ylim(1.5, -0.5)
-for i in range(2):
-    for j in range(2):
-        ax.text(j, i, cm[i, j], ha='center', va='center', color='red')
-plt.title('Confusion matrix for LDA for the Watermelon 3.0 data')
-plt.show()
-
-
-lda_roc_auc = roc_auc_score(y, lda.predict(X))
-fpr, tpr, thresholds = roc_curve(y, lda.predict_proba(X)[:, 1])
-plt.figure()
-plt.plot(fpr, tpr, label='LDA (area = %0.2f)' % lda_roc_auc)
-plt.plot([0, 1], [0, 1], 'r--')
-plt.xlim([0.0, 1.0])
-plt.ylim([0.0, 1.05])
-plt.xlabel('False Positive Rate')
-plt.ylabel('True Positive Rate')
-plt.title('Receiver operating characteristic')
-plt.legend(loc="lower right")
-plt.show()
-
-
-#%%
-####################################################
-# Step 5: Improve the Model
-####################################################
-lda2 = LinearDiscriminantAnalysis(solver='lsqr')
-lda2.fit(X, y)
-
-print(
-      "Classes: ", lda2.classes_, "\n",
-      "Intercept: ", lda2.intercept_,"\n",
-      "Coefficients: ", lda2.coef_
-      )
-print(confusion_matrix(y, lda2.predict(X)))
-print(classification_report(y, lda2.predict(X)))
-
-#%%
-##################################################
-# Step 6: Plot the model  
-#################################################
-
-plt.figure(1, figsize=(4, 3))
-plt.clf()
-plt.scatter(np.arange(17), y, color="black", zorder=20, marker="s", s=25)
-x_test = np.linspace(-5, 10, 300)
-
-plt.scatter(np.arange(17), lda.predict(X), color="red", zorder=20,s=15)
-
-plt.ylabel("y")
-plt.xlabel("ID")
-plt.yticks([0, 1])
-#plt.yticklabels([False,  True], minor=False)
-plt.ylim(-0.25, 1.5)
-plt.legend(
-    ("Actual value", "Predicted value"),
-    loc="upper left",
-    fontsize="small",
-)
-plt.title('LDA for the Watermelon 3.0 data')
 plt.tight_layout()
 plt.show()
-
+```
+The final visualization provides a scatter plot comparing actual and predicted values, offering a clear visual assessment of the model's predictions against the true labels. This plot helps in quickly identifying patterns of misclassification and verifying the effectiveness of the model's predictions.
