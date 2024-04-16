@@ -488,8 +488,8 @@ print(f'Confusion Matrix: {confusion_matrix(y, y_pred_logreg)}')
   - **Top left**: True negatives (TN)
   - **Top right**: False positives (FP)
   - **Bottom left**: False negatives (FN)
-  - **Bottom right**: True positives (TP)
-- This output helps understand not just the errors being made by the classifier but also the types of errors that are occurring.
+  - **Bottom right**: True positives (TP) 
+- This output helps understand not just the errors being made by the classifier but also the types of errors that are occurring. Refer this [image!](image-2.png)
 
 ```python
 print(f'Classification Report: {classification_report(y, y_pred_logreg)}')
@@ -586,8 +586,24 @@ plt.show()
 ```
 - **`plt.title`**: Sets the title of the plot.
 - **`plt.show()`**: Displays the figure with all its elements. This function call is necessary to actually render the visualization when not using interactive environments like Jupyter notebooks.
+![heatmap1](image-2.png)
 
 **Summary:** This code effectively visualizes the confusion matrix as a heatmap, enhancing interpretation by annotating each cell with the corresponding count of predictions, making it clear how many and what type of errors the logistic regression model is making. Such visualizations are crucial for understanding model performance beyond scalar metrics like accuracy.
+
+
+
+
+
+# to do from here!!!
+
+
+
+
+
+
+
+
+
 
 ### Receiver Operating Characteristic (ROC) Curve
 ```python
