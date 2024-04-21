@@ -324,8 +324,7 @@ plt.show()
 - **`plt.ylabel("sugar")`**, **`plt.xlabel("density")`**, and **`plt.title('Watermelon 3.0')`**: Label the axes and add a title to the plot.
 - **`plt.show()`**: Displays the plot.
 
-This plot visualizes the relationship between `density` and `sugar` content of watermelons, with the ripeness depicted by different colors. It's a common practice in exploratory data analysis to understand how different features relate to a categorical outcome (like ripeness).  
-This visualization could help in understanding patterns or clustering that might indicate which factors contribute to a watermelon being considered ripe.
+This plot visualizes the relationship between `density` and `sugar` content of watermelons, with the ripeness depicted by different colors. It's a common practice in exploratory data analysis to understand how different features relate to a categorical outcome (like ripeness). This visualization could help in understanding patterns or clustering that might indicate which factors contribute to a watermelon being considered ripe.  
 ![View the image.](image.png)
 
 ### Scaling data
