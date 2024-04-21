@@ -590,21 +590,6 @@ plt.show()
 
 **Summary:** This code effectively visualizes the confusion matrix as a heatmap, enhancing interpretation by annotating each cell with the corresponding count of predictions, making it clear how many and what type of errors the logistic regression model is making. Such visualizations are crucial for understanding model performance beyond scalar metrics like accuracy.
 
-
-
-
-
-# to do from here!!!
-
-
-
-
-
-
-
-
-
-
 ### Receiver Operating Characteristic (ROC) Curve
 ```python
 from sklearn.metrics import roc_curve, roc_auc_score
@@ -623,7 +608,59 @@ plt.show
 
 ()
 ```
-This section plots the ROC curve for the logistic regression model, providing a graphical representation of the trade-off between the true positive rate and false positive rate for different threshold settings. The area under the curve (AUC) gives a single scalar value to indicate the overall performance of the model across all threshold levels.
+This code snippet is used for evaluating the performance of a logistic regression model using the receiver operating characteristic (ROC) curve and the area under the curve (AUC). Here's a breakdown of what each part of the code does:
+
+1. **ROC AUC Score Calculation:**
+   ```python
+   logreg_roc_auc = roc_auc_score(y, logreg.predict(X))
+   ```
+   This line calculates the area under the ROC curve (AUC), which is a measure of the model's ability to discriminate between the positive and negative classes. The `roc_auc_score` function from `sklearn.metrics` is used here, and it compares the true labels `y` with the predictions made by the logistic regression model `logreg.predict(X)`. However, using `logreg.predict(X)` might be a mistake if it outputs class labels rather than probabilities, as AUC requires probability scores or decision function values. Usually, `logreg.predict_proba(X)[:, 1]` is used for ROC AUC computation.
+
+2. **ROC Curve Calculation:**
+   ```python
+   fpr, tpr, thresholds = roc_curve(y, logreg.predict_proba(X)[:, 1])
+   ```
+   This function computes the false positive rate (`fpr`), true positive rate (`tpr`), and thresholds used to generate the ROC curve. `roc_curve` requires the true binary labels `y` and the probability scores of the positive class, which is why `logreg.predict_proba(X)[:, 1]` is used (to get the probability estimates for the positive class).
+
+3. **Plotting the ROC Curve:**
+   ```python
+   plt.figure()
+   plt.plot(fpr, tpr, label='Logistic Regression (area = %0.2f)' % logreg_roc_auc)
+   plt.plot([0, 1], [0, 1], 'r--')
+   plt.xlim([0.0, 1.0])
+   plt.ylim([0.0, 1.05])
+   plt.xlabel('False Positive Rate')
+   plt.ylabel('True Positive Rate')
+   plt.title('Receiver operating characteristic')
+   plt.legend(loc="lower right")
+   plt.show()
+   ```
+   - `plt.figure()` starts a new figure for plotting.
+   - `plt.plot(fpr, tpr, label='...')` plots the ROC curve with the true positive rate vs. the false positive rate. The label includes the AUC value.
+   - `plt.plot([0, 1], [0, 1], 'r--')` plots a red dashed diagonal line from the bottom left to the top right of the plot. This line represents a no-skill classifier (random guess); an effective model should have a curve significantly above this line.
+   - `plt.xlim` and `plt.ylim` set the limits of the x and y axes.
+   - `plt.xlabel` and `plt.ylabel` label the axes.
+   - `plt.title` adds a title to the plot.
+   - `plt.legend` places a legend on the plot, typically in the lower right corner.
+   - `plt.show()` displays the plot. The parentheses are required to execute the function, which might be missing in the given code snippet.
+
+Overall, this code evaluates how well the logistic regression model can distinguish between two classes and visualizes this capability via the ROC curve.  
+The result we get from this exercise is:  
+![ROCcurve](image-3.png)
+<details>
+<summary><i>Explanation for the image! </i></summary>
+
+| Components | Explanations | 
+| --- | --- | 
+| X-axis (False Positive Rate) | The false positive rate (FPR) is plotted along the X-axis. It represents the proportion of negative instances that are incorrectly classified as positive by the model. It is calculated as `FP / (TN + FP)`, where FP is the number of false positives and TN is the number of true negatives. The FPR ranges from 0 to 1, with 0 meaning no false positives and 1 meaning all negatives are incorrectly classified as positives. | 
+| Y-axis (True Positive Rate) | The true positive rate (TPR), also known as sensitivity or recall, is plotted along the Y-axis. It represents the proportion of positive instances that are correctly identified by the model. It is calculated as `TP / (TP + FN)`, where TP is the number of true positives and FN is the number of false negatives. The TPR also ranges from 0 to 1, with 1 meaning all positives are correctly identified. | 
+| ROC Curve | The blue line represents the ROC curve of the logistic regression model. It traces the trade-off between the TPR and FPR for different threshold settings. The threshold is the probability or score at which the decision is made whether an instance is classified as positive or negative. | 
+| Reference Line | The red dashed line represents the 'no-skill' classifier, which simply guesses the class randomly. It serves as a baseline; any meaningful classifier should achieve performance above this line. | 
+| AUC (Area Under the Curve) | The area under the ROC curve is denoted in the legend as 0.88 (which is a high value, suggesting good discriminatory ability). The AUC value ranges from 0 to 1, where 0.5 corresponds to a no-skill classifier and 1 corresponds to a perfect classifier. An AUC of 0.88 indicates that the logistic regression model has a high likelihood of ranking a randomly chosen positive instance higher than a randomly chosen negative one. | 
+| Title and Labels | The plot is titled "Receiver operating characteristic," with appropriate labels for the X and Y axes ("False Positive Rate" and "True Positive Rate" respectively). | 
+
+In summary, the ROC curve in the image suggests that the logistic regression model has good predictive power, as indicated by the AUC of 0.88 and the curve being significantly above the red reference line.
+</details>
 
 ## Step 5: Improve the Model
 ```python
@@ -654,3 +691,104 @@ plt.tight_layout()
 plt.show()
 ```
 The final visualization provides a scatter plot comparing actual and predicted values, offering a clear visual assessment of the model's predictions against the true labels. This plot helps in quickly identifying patterns of misclassification and verifying the effectiveness of the model's predictions.
+
+## & Repeat 
+
+### Step 3: Create a Model and Train It  (LINEAR DISCRIMINANT ANALYSIS)
+
+`lda = LinearDiscriminantAnalysis()`
+solver is a string ('svd' by default) that decides what solver to use for fitting the model. ‘svd’: Singular value decomposition (default). Does not compute the covariance matrix, therefore this solver is recommended for data with a large number of features.
+
+```python
+lda_result=lda.fit(X, y)
+y_pred_lda = lda_result.predict(X)
+```
+
+**Quick look at the attributes**
+```python
+print(
+      "Classes: ", lda.classes_, "\n",
+      "Intercept: ", lda.intercept_,"\n",
+      "Coefficients: ", lda.coef_
+      )
+```
+
+### Step 4: Evaluate the Model
+
+```python
+print(f'Accuracy: {accuracy_score(y, y_pred_lda)}')
+print(f'Confusion Matrix: {confusion_matrix(y, y_pred_lda)}')
+print(f'Classification Report: {classification_report(y, y_pred_lda)}')
+
+print(lda.predict_proba(X)) # Predicted Output False/True 
+print(lda.predict(X)) #Actual Predictions
+```
+**Cofusion matrix as heat map**
+```python 
+cm = confusion_matrix(y, y_pred_lda)
+fig, ax = plt.subplots(figsize=(3, 3))
+ax.imshow(cm)
+ax.grid(False)
+ax.xaxis.set(ticks=(0, 1), ticklabels=('Predicted False', 'Predicted True'))
+ax.yaxis.set(ticks=(0, 1), ticklabels=('Actual False', 'Actual Ture'))
+ax.set_ylim(1.5, -0.5)
+for i in range(2):
+    for j in range(2):
+        ax.text(j, i, cm[i, j], ha='center', va='center', color='red')
+plt.title('Confusion matrix for LDA for the Watermelon 3.0 data')
+plt.show()
+```
+```python
+lda_roc_auc = roc_auc_score(y, lda.predict(X))
+fpr, tpr, thresholds = roc_curve(y, lda.predict_proba(X)[:, 1])
+plt.figure()
+plt.plot(fpr, tpr, label='LDA (area = %0.2f)' % lda_roc_auc)
+plt.plot([0, 1], [0, 1], 'r--')
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('Receiver operating characteristic')
+plt.legend(loc="lower right")
+plt.show()
+```
+
+### Step 5: Improve the Model
+
+```python
+lda2 = LinearDiscriminantAnalysis(solver='lsqr')
+lda2.fit(X, y)
+
+print(
+      "Classes: ", lda2.classes_, "\n",
+      "Intercept: ", lda2.intercept_,"\n",
+      "Coefficients: ", lda2.coef_
+      )
+print(confusion_matrix(y, lda2.predict(X)))
+print(classification_report(y, lda2.predict(X)))
+```
+
+### Step 6: Plot the model  
+
+```python
+plt.figure(1, figsize=(4, 3))
+plt.clf()
+plt.scatter(np.arange(17), y, color="black", zorder=20, marker="s", s=25)
+x_test = np.linspace(-5, 10, 300)
+
+plt.scatter(np.arange(17), lda.predict(X), color="red", zorder=20,s=15)
+
+plt.ylabel("y")
+plt.xlabel("ID")
+plt.yticks([0, 1])
+#plt.yticklabels([False,  True], minor=False)
+plt.ylim(-0.25, 1.5)
+plt.legend(
+    ("Actual value", "Predicted value"),
+    loc="upper left",
+    fontsize="small",
+)
+plt.title('LDA for the Watermelon 3.0 data')
+plt.tight_layout()
+plt.show()
+```
