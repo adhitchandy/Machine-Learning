@@ -5,13 +5,13 @@ import pandas as pd
 import numpy as np
 
 # %%
-os.chdir("Desktop/machine_learning_tutorial")
+os.chdir("/Users/adhitchandy/Library/CloudStorage/OneDrive-M365UniversitätHamburg/Semester 4/Machine Learning/Tutorial/data")
 
-df = pd.read_csv("bank_marketing.csv")
+raw_data = pd.read_csv("bank_marketing.csv")
+df = raw_data
 
-"""
-Aim: Predict if client will subcribe a term deposit.
-"""
+#Aim: Predict if client will subcribe a term deposit.
+
 # %%
 ############################################################
 # Data Summary
